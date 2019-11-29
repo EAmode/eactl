@@ -1,0 +1,42 @@
+{
+  "name": "@eamode/eactl",
+  "version": "1.0.0",
+  "description": "EA Mode manangement CLI",
+  "main": "src/index.js",
+  "bin": {
+    "@eamode/eactl": "bin/eactl",
+    "eactl": "bin/eactl"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EAmode/eactl.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EAmode/eactl/issues"
+  },
+  "homepage": "https://github.com/EAmode/eactl#readme",
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 80
+  },
+  "dependencies": {
+    "arg": "^4.1.2",
+    "chalk": "^3.0.0",
+    "esm": "^3.2.25",
+    "execa": "^3.4.0",
+    "inquirer": "^7.0.0",
+    "js-yaml": "^3.13.1",
+    "listr": "^0.14.3",
+    "ncp": "^2.0.0",
+    "pkg-install": "^1.0.0"
+  }
+}
