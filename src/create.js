@@ -1,84 +1,135 @@
-import chalk from 'chalk'
 import fs from 'fs'
-import ncp from 'ncp'
-import path from 'path'
-import { resolve } from 'path'
+
 import { promisify } from 'util'
+import chalk from 'chalk'
 import execa from 'execa'
 import Listr from 'listr'
-import { projectInstall } from 'pkg-install'
-import { safeLoad } from 'js-yaml'
+import inquirer from 'inquirer'
+
+import { copyConfd, reloadNginx } from './tasks'
 
 const access = promisify(fs.access)
-const copy = promisify(ncp)
 
-async function copyTemplateFiles(options) {
-  return copy(options.templateDirectory, options.targetDirectory, {
-    clobber: false
-  })
+export async function create(options) {
+  if (options.commandType === 'website') {
+    if (!options.commandOption1) {
+      const answers = await inquirer.prompt({
+        type: 'input',
+        name: 'commandOption1',
+        message: 'Please provide the hostname',
+        validate: input => {
+          const isValid = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/.test(
+            input
+          )
+          if (isValid) {
+            return true
+          }
+          return 'Please enter a valid hostname'
+        }
+      })
+      options.commandOption1 = answers.commandOption1
+    }
+    if (!options.commandOption2) {
+      const answers = await inquirer.prompt({
+        type: 'input',
+        name: 'commandOption2',
+        message: 'Please provide the path to website files',
+        validate: async input => {
+          try {
+            await access(input, fs.constants.R_OK)
+            return true
+          } catch (err) {
+            if (err.code === 'ENOENT') return 'Directory not found'
+          }
+          return 'Path is invalid'
+        }
+      })
+      options.commandOption2 = answers.commandOption2
+    }
+    createWebsite(options)
+  }
 }
 
-async function initGit(options) {
-  const result = await execa('git', ['init'], {
-    cwd: options.targetDirectory
-  })
-  if (result.failed) {
-    return Promise.reject(new Error('Failed to initialize git'))
+async function createWebsite(options) {
+  const { envData, envPath, commandOption1, commandOption2 } = options
+  const { server } = envData
+
+  const conf = `server {
+    listen 80;
+    server_name ${commandOption1} www.${commandOption1};
+    return 301 https://$server_name$request_uri;
   }
-  return
-}
-
-export async function ls(options) {
-  try {
-    const environment = safeLoad(
-      fs.readFileSync(
-        resolve(options.path, options.environment, 'env.yaml'),
-        'utf8'
-      )
-    )
-    console.log(environment)
-  } catch (e) {
-    console.log(e)
-  }
-
-  const templateDir = path.resolve(
-    new URL(import.meta.url).pathname,
-    '../../templates',
-    options.template
-  )
-  options.templateDirectory = templateDir
-
-  try {
-    await access(templateDir, fs.constants.R_OK)
-  } catch (err) {
-    console.error('%s Invalid template name', chalk.red.bold('ERROR'))
-    process.exit(1)
-  }
-
+  
+  server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+  
+    server_name ${commandOption1} www.${commandOption1};
+  
+    ssl_certificate /etc/letsencrypt/live/eamode.com-0001/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/eamode.com-0001/privkey.pem;
+  
+    root ${server.webPath}/${commandOption1};
+    index index.html;
+  
+    location / {
+      add_header Cache-Control no-cache;
+      try_files $uri$args $uri$args/ $uri $uri/ /index.html =404;
+    }
+  }`
   const tasks = new Listr([
     {
-      title: 'Copy project files',
-      task: () => copyTemplateFiles(options)
+      title: `Create conf.d/${commandOption1}.conf`,
+      task: async () => {
+        try {
+          fs.writeFileSync(`${envPath}/conf.d/${commandOption1}.conf`, conf)
+        } catch (err) {
+          throw new Error(err.message)
+        }
+      }
     },
     {
-      title: 'Initialize git',
-      task: () => initGit(options),
-      enabled: () => options.git
+      title: 'Copy conf.d to ' + server.url,
+      task: () => copyConfd(server.user, server.url, envPath)
     },
     {
-      title: 'Install dependencies',
-      task: () =>
-        projectInstall({
-          cwd: options.targetDirectory
-        }),
-      skip: () =>
-        !options.runInstall
-          ? 'Pass --install to automatically install dependencies'
-          : undefined
+      title: `Copy website to ${server.webPath}/${commandOption1}`,
+      task: async () => {
+        try {
+          await execa(
+            `ssh`,
+            [
+              `-i ${envPath}/${server.user}.private`,
+              `${server.user}@${server.url}`,
+              `mkdir -p ${server.webPath}/${commandOption1}`
+            ],
+            { cwd: envPath }
+          )
+          // console.log(result)
+          await execa('scp', [
+            `-i ${envPath}/${server.user}.private`,
+            `-pr`,
+            `${commandOption2}/*`,
+            `${server.user}@${server.url}:${server.webPath}/${commandOption1}`
+          ])
+        } catch (err) {
+          if (err.stderr) throw new Error(err.stderr)
+          else throw new Error(err.message)
+        }
+      }
+    },
+    {
+      title: 'Reloading NGINX',
+      task: () => reloadNginx(server.user, server.url, envPath)
     }
   ])
 
-  await tasks.run()
-  console.log('%s Project ready', chalk.green.bold('DONE'))
-  return true
+  try {
+    await tasks.run()
+    return true
+  } catch (err) {
+    console.log(err)
+    console.error(chalk.red.bold('Error: ') + err.message)
+    return false
+  }
 }
