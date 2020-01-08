@@ -30,3 +30,29 @@ export async function copyConfd(user, serverUrl, envPath) {
     else throw new Error(err.message)
   }
 }
+
+export async function copyWebsite(server, localPath, wwwPath, envPath) {
+  try {
+    await execa('scp', [
+      `-i ${envPath}/${server.user}.private`,
+      `-pr`,
+      `${localPath}/*`,
+      `${server.user}@${server.url}:${server.webPath}/${wwwPath}`
+    ])
+  } catch (err) {
+    if (err.stderr) throw new Error(err.stderr)
+    else throw new Error(err.message)
+  }
+}
+
+export async function deleteWebsite(server, wwwPath, envPath) {
+  try {
+    await execa('ssh', [
+      `-i ${envPath}/${server.user}.private`,
+      `rm -rf ${server.webPath}/${wwwPath}`
+    ])
+  } catch (err) {
+    if (err.stderr) throw new Error(err.stderr)
+    else throw new Error(err.message)
+  }
+}

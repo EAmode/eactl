@@ -9,7 +9,7 @@ import inquirer from 'inquirer'
 import chalk from 'chalk'
 
 import { ls } from './ls'
-import { updateNginx } from './update'
+import { update } from './update'
 import { create } from './create'
 
 const access = promisify(fs.access)
@@ -131,7 +131,7 @@ async function promptForMissingOptions(options) {
       type: 'list',
       name: 'command',
       message: 'Please choose a command',
-      choices: ['ls', 'create'],
+      choices: ['ls', 'update', 'create'],
       default: 'ls'
     })
   }
@@ -207,9 +207,6 @@ export async function cli(args) {
       const answers = await inquirer.prompt(questions)
       options.commandType = answers.commandType
     }
-
-    if (options.commandType === 'nginx') {
-      updateNginx(options)
-    }
+    update(options)
   }
 }

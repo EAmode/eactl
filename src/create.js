@@ -6,7 +6,7 @@ import execa from 'execa'
 import Listr from 'listr'
 import inquirer from 'inquirer'
 
-import { copyConfd, reloadNginx } from './tasks'
+import { copyConfd, reloadNginx, copyWebsite } from './tasks'
 
 const access = promisify(fs.access)
 
@@ -106,12 +106,14 @@ async function createWebsite(options) {
             { cwd: envPath }
           )
           // console.log(result)
-          await execa('scp', [
-            `-i ${envPath}/${server.user}.private`,
-            `-pr`,
-            `${commandOption2}/*`,
-            `${server.user}@${server.url}:${server.webPath}/${commandOption1}`
-          ])
+
+          await copyWebsite(server, envPath, commandOption2, commandOption1, envPath)
+          // await execa('scp', [
+          //   `-i ${envPath}/${server.user}.private`,
+          //   `-pr`,
+          //   `${commandOption2}/*`,
+          //   `${server.user}@${server.url}:${server.webPath}/${commandOption1}`
+          // ])
         } catch (err) {
           if (err.stderr) throw new Error(err.stderr)
           else throw new Error(err.message)
