@@ -47,10 +47,15 @@ export async function copyWebsite(server, localPath, wwwPath, envPath) {
 
 export async function deleteWebsite(server, wwwPath, envPath) {
   try {
-    await execa('ssh', [
-      `-i ${envPath}/${server.user}.private`,
-      `rm -rf ${server.webPath}/${wwwPath}`
-    ])
+    await execa(
+      'ssh',
+      [
+        `-i ${envPath}/${server.user}.private`,
+        `${server.user}@${server.url}`,
+        `rm -r -f ${server.webPath}/${wwwPath}/*`
+      ],
+      { cwd: envPath }
+    )
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
     else throw new Error(err.message)

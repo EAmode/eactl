@@ -6,9 +6,11 @@ import execa from 'execa'
 import Listr from 'listr'
 import inquirer from 'inquirer'
 
+import { deleteWebsite } from './tasks'
+
 const access = promisify(fs.access)
 
-import { copyConfd, reloadNginx } from './tasks'
+import { copyConfd, reloadNginx, copyWebsite } from './tasks'
 
 export async function update(options) {
   if (options.commandType === 'website') {
@@ -102,16 +104,12 @@ async function updateWebsite(options) {
   const tasks = new Listr([
     {
       title: `Deleting ${server.webPath}/${commandOption1}`,
-      task: () => deleteWebsite(server, commandOption1, envPath)
+      task: async () => await deleteWebsite(server, commandOption1, envPath)
     },
-    // {
-    //   title: 'Copy conf.d to ' + server.url,
-    //   task: () => copyConfd(server.user, server.url, envPath)
-    // },
-    // {
-    //   title: 'Reloading NGINX',
-    //   task: () => reloadNginx(server.user, server.url, envPath)
-    // }
+    {
+      title: `Copy website to ${server.webPath}/${commandOption1}`,
+      task: () => copyWebsite(server, commandOption2, commandOption1, envPath)
+    }
   ])
 
   try {

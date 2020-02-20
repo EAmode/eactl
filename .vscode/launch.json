@@ -19,16 +19,39 @@
       "name": "create website",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/eactl",
-      "args": ["create", "website", "knowledge.eamode.com", "../knowledge-ui/dist/ui/", "-e", "mode"],
+      "args": [
+        "create",
+        "website",
+        "knowledge.eamode.com",
+        "../knowledge/knowledge-ui/dist/ui/",
+        "-e",
+        "mode"
+      ],
       "console": "integratedTerminal"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Update Nginx",
+      "name": "update nginx",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/eactl",
       "args": ["update", "nginx", "-e", "mode"],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "update website",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/bin/eactl",
+      "args": [
+        "update",
+        "website",
+        "knowledge.eamode.com",
+        "../knowledge/knowledge-ui/dist/ui",
+        "-e",
+        "mode"
+      ],
       "console": "integratedTerminal"
     }
   ]

@@ -107,7 +107,7 @@ async function createWebsite(options) {
           )
           // console.log(result)
 
-          await copyWebsite(server, envPath, commandOption2, commandOption1, envPath)
+          await copyWebsite(server, commandOption2, commandOption1, envPath)
           // await execa('scp', [
           //   `-i ${envPath}/${server.user}.private`,
           //   `-pr`,
