@@ -105,15 +105,7 @@ async function createWebsite(options) {
             ],
             { cwd: envPath }
           )
-          // console.log(result)
-
           await copyWebsite(server, commandOption2, commandOption1, envPath)
-          // await execa('scp', [
-          //   `-i ${envPath}/${server.user}.private`,
-          //   `-pr`,
-          //   `${commandOption2}/*`,
-          //   `${server.user}@${server.url}:${server.webPath}/${commandOption1}`
-          // ])
         } catch (err) {
           if (err.stderr) throw new Error(err.stderr)
           else throw new Error(err.message)
