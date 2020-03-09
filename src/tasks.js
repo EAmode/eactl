@@ -53,7 +53,7 @@ export async function deleteWebsite(server, wwwPath, envPath) {
       [
         '-i',
         envPath + '/' + server.user + '.private',
-        envPath + '/' + server.user + '.private',
+        server.user + '@' + server.url,
         'rm -r -f ' + server.webPath + '/' + wwwPath + '/*'
       ],
       { cwd: envPath }
