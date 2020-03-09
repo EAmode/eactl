@@ -22,8 +22,8 @@
       "args": [
         "create",
         "website",
-        "knowledge.eamode.com",
-        "../knowledge/knowledge-ui/dist/ui/",
+        "ace2-monitor.eamode.com",
+        "../../ace2/ace2-monitor-ui/dist/ace2-monitor-ui/",
         "-e",
         "mode"
       ],

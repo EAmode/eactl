@@ -18,10 +18,10 @@ export async function copyConfd(user, serverUrl, envPath) {
     await execa(
       'scp',
       [
-        `-i`,
-        `${user}.private`,
-        `conf.d/*.conf`,
-        `${user}@${serverUrl}:/etc/nginx/conf.d`
+        '-i',
+        envPath + '/' + user + '.private',
+        'conf.d/*.conf',
+        user + '@' + serverUrl + ':/etc/nginx/conf.d'
       ],
       { cwd: envPath }
     )
@@ -34,10 +34,11 @@ export async function copyConfd(user, serverUrl, envPath) {
 export async function copyWebsite(server, localPath, wwwPath, envPath) {
   try {
     await execa('scp', [
-      `-i ${envPath}/${server.user}.private`,
-      `-pr`,
-      `${localPath}/*`,
-      `${server.user}@${server.url}:${server.webPath}/${wwwPath}`
+      '-i',
+      envPath + '/' + server.user + '.private',
+      '-pr',
+      localPath + '/*',
+      server.user + '@' + server.url + ':' + server.webPath + '/' + wwwPath
     ])
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
@@ -50,9 +51,10 @@ export async function deleteWebsite(server, wwwPath, envPath) {
     await execa(
       'ssh',
       [
-        `-i ${envPath}/${server.user}.private`,
-        `${server.user}@${server.url}`,
-        `rm -r -f ${server.webPath}/${wwwPath}/*`
+        '-i',
+        envPath + '/' + server.user + '.private',
+        envPath + '/' + server.user + '.private',
+        'rm -r -f ' + server.webPath + '/' + wwwPath + '/*'
       ],
       { cwd: envPath }
     )

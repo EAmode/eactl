@@ -5,6 +5,7 @@ import chalk from 'chalk'
 import execa from 'execa'
 import Listr from 'listr'
 import inquirer from 'inquirer'
+import { parse } from 'psl'
 
 import { copyConfd, reloadNginx, copyWebsite } from './tasks'
 
@@ -54,6 +55,16 @@ async function createWebsite(options) {
   const { envData, envPath, commandOption1, commandOption2 } = options
   const { server } = envData
 
+  const parsed_domain = parse(commandOption1)
+  const domain = parsed_domain.domain
+
+  let certName = commandOption1
+  for (const c of options.envData.certs) {
+    if (c.wildcard && c.domain === domain) {
+      certName = c.name
+    }
+  }
+
   const conf = `server {
     listen 80;
     server_name ${commandOption1} www.${commandOption1};
@@ -66,8 +77,8 @@ async function createWebsite(options) {
   
     server_name ${commandOption1};
   
-    ssl_certificate /etc/letsencrypt/live/${commandOption1}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${commandOption1}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${certName}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${certName}/privkey.pem;
   
     root ${server.webPath}/${commandOption1};
     index index.html;
@@ -96,15 +107,12 @@ async function createWebsite(options) {
       title: `Copy website to ${server.webPath}/${commandOption1}`,
       task: async () => {
         try {
-          await execa(
-            `ssh`,
-            [
-              `-i ${envPath}/${server.user}.private`,
-              `${server.user}@${server.url}`,
-              `mkdir -p ${server.webPath}/${commandOption1}`
-            ],
-            { cwd: envPath }
-          )
+          await execa(`ssh`, [
+            '-i',
+            envPath + '/' + server.user + '.private',
+            server.user + '@' + server.url,
+            `mkdir -p ${server.webPath}/${commandOption1}`
+          ])
           await copyWebsite(server, commandOption2, commandOption1, envPath)
         } catch (err) {
           if (err.stderr) throw new Error(err.stderr)
