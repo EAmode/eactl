@@ -64,10 +64,10 @@ async function createWebsite(options) {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
   
-    server_name ${commandOption1} www.${commandOption1};
+    server_name ${commandOption1};
   
-    ssl_certificate /etc/letsencrypt/live/eamode.com-0001/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/eamode.com-0001/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${commandOption1}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${commandOption1}/privkey.pem;
   
     root ${server.webPath}/${commandOption1};
     index index.html;

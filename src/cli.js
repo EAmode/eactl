@@ -33,6 +33,7 @@ Usage:
 Options:
  -e,--environment   Select available environments in the EACTL_PATH folder
  -p,--path          Defaults to ~/env/. Can also be set by EACTL_PATH env variable
+ -s,--subdomains    Add subdomains
  --help             Print this help
 
 Examples:
@@ -43,11 +44,11 @@ function parseArgumentsIntoOptions(rawArgs) {
     {
       '--environment': String,
       '--path': String,
-      '--install': Boolean,
+      '--subdomains': [String],
       '--help': Boolean,
       '-e': '--environment',
       '-p': '--path',
-      '-i': '--install'
+      '-s': '--subdomains'
     },
     {
       argv: rawArgs.slice(2)
@@ -56,11 +57,11 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     path: args['--path'] || process.env.EACTL_PATH,
     environment: args['--environment'],
+    subdomains: args['--subdomains'],
     command: args._[0],
     commandType: args._[1],
     commandOption1: args._[2],
     commandOption2: args._[3],
-    runInstall: args['--install'] || false,
     printHelp: args['--help'] || false
   }
 }
