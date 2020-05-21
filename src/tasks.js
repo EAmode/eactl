@@ -38,7 +38,9 @@ export async function copyWebsite(server, localPath, wwwPath, envPath) {
     const cmd = `scp ${getCommonOptions(
       envPath,
       server.user
-    )} -pr ${localPath}/* ${server.user}@${server.url}:${server.webPath}/${wwwPath}`
+    )} -pr ${localPath}/* ${server.user}@${server.url}:${
+      server.webPath
+    }/${wwwPath}`
     await execa(cmd)
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
@@ -48,15 +50,10 @@ export async function copyWebsite(server, localPath, wwwPath, envPath) {
 
 export async function deleteWebsite(server, wwwPath, envPath) {
   try {
-    await execa(
-      'ssh',
-      [
-        getCommonOptions(envPath, user),
-        server.user + '@' + server.url,
-        'rm -r -f ' + server.webPath + '/' + wwwPath + '/*',
-      ],
-      { cwd: envPath }
-    )
+    const cmd = `ssh ${getCommonOptions(envPath, server.user)} ${server.user}@${
+      server.url
+    } rm -rf ${server.webPath}/${wwwPath}/*`
+    await execa(cmd)
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
     else throw new Error(err.message)

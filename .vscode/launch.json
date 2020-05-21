@@ -47,8 +47,8 @@
       "args": [
         "update",
         "website",
-        "knowledge.eamode.com",
-        "../knowledge/knowledge-ui/dist/ui",
+        "ea.eamode.cloud",
+        "../mode/mode-ui-exp/dist/mode-ui-exp/",
         "-e",
         "mode"
       ],
