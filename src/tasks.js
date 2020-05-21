@@ -1,9 +1,16 @@
 import execa from 'execa'
 
+function getCommonOptions(envPath, user) {
+  return `-oStrictHostKeyChecking=no -i ${envPath}/${user}.private`
+}
+
 export async function reloadNginx(user, serverUrl, envPath) {
   try {
     await execa(
-      `ssh -i ${user}.private ${user}@${serverUrl} sudo systemctl reload nginx`,
+      `ssh ${getCommonOptions(
+        envPath,
+        user
+      )} ${user}@${serverUrl} sudo systemctl reload nginx`,
       [],
       { cwd: envPath }
     )
@@ -15,16 +22,11 @@ export async function reloadNginx(user, serverUrl, envPath) {
 
 export async function copyConfd(user, serverUrl, envPath) {
   try {
-    await execa(
-      'scp',
-      [
-        '-i',
-        envPath + '/' + user + '.private',
-        'conf.d/*.conf',
-        user + '@' + serverUrl + ':/etc/nginx/conf.d'
-      ],
-      { cwd: envPath }
-    )
+    const cmd = `scp ${getCommonOptions(
+      envPath,
+      user
+    )} conf.d/*.conf ${user}@${serverUrl}:/etc/nginx/conf.d`
+    await execa(cmd, { cwd: envPath })
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
     else throw new Error(err.message)
@@ -33,13 +35,11 @@ export async function copyConfd(user, serverUrl, envPath) {
 
 export async function copyWebsite(server, localPath, wwwPath, envPath) {
   try {
-    await execa('scp', [
-      '-i',
-      envPath + '/' + server.user + '.private',
-      '-pr',
-      localPath + '/*',
-      server.user + '@' + server.url + ':' + server.webPath + '/' + wwwPath
-    ])
+    const cmd = `scp ${getCommonOptions(
+      envPath,
+      server.user
+    )} -pr ${localPath}/* ${server.user}@${server.url}:${server.webPath}/${wwwPath}`
+    await execa(cmd)
   } catch (err) {
     if (err.stderr) throw new Error(err.stderr)
     else throw new Error(err.message)
@@ -51,10 +51,9 @@ export async function deleteWebsite(server, wwwPath, envPath) {
     await execa(
       'ssh',
       [
-        '-i',
-        envPath + '/' + server.user + '.private',
+        getCommonOptions(envPath, user),
         server.user + '@' + server.url,
-        'rm -r -f ' + server.webPath + '/' + wwwPath + '/*'
+        'rm -r -f ' + server.webPath + '/' + wwwPath + '/*',
       ],
       { cwd: envPath }
     )

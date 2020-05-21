@@ -61,7 +61,7 @@ async function createWebsite(options) {
   let certName = commandOption1
   for (const c of options.envData.certs) {
     if (c.wildcard && c.domain === domain) {
-      certName = c.name
+      certName = c.name || c.domain
     }
   }
 

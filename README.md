@@ -1,6 +1,14 @@
 # eactl
 EA Mode management CLI. Managing infrastructure and applications
 
+## Eaxamples
+```sh
+eactl create website ea.eamode.cloud dist/mode-ui-exp/ -e mode
+eactl update website ea.eamode.cloud dist/mode-ui-exp/ -e mode
+
+```
+
+
 ## ssh shell access 
 ```shell
 ssh prod-admin@eamode.com -i env/mode/prod-admin.private
@@ -9,7 +17,7 @@ ssh prod-admin@wbg.eamode.com -i env/wbg/prod/prod-admin.private
 
 ## Certificates
 ```shell
-sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory -d '*.eamode.com'
+sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory -d '*.eamode.cloud'
 sudo certbot --nginx -d example.com -d stage.example.com -d www.example.com
 ```
 ## Developer
