@@ -16,9 +16,19 @@ ssh prod-admin@wbg.eamode.com -i env/wbg/prod/prod-admin.private
 ```
 
 ## Certificates
+Subdomain HTTP validation
 ```shell
-sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory -d '*.eamode.cloud'
 sudo certbot --nginx -d example.com -d stage.example.com -d www.example.com
+```
+Wildcard DNS validation
+
+```shell
+# create
+sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory -d '*.eamode.cloud'
+sudo certbot certonly -d '*.eamode.com' -d 'eamode.com' --manual --preferred-challenges dns --keep-until-expiring --quiet --manual-auth-hook /root/authenticator_godaddy.sh  --manual-cleanup-hook /root/cleanup_godaddy.sh 
+#renew
+
+
 ```
 ## Developer
 ```shell
