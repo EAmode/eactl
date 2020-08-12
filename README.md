@@ -24,11 +24,11 @@ Wildcard DNS validation
 
 ```shell
 # create
-sudo certbot certonly --manual --preferred-challenges dns --server https://acme-v02.api.letsencrypt.org/directory -d '*.eamode.cloud'
-sudo certbot certonly -d '*.eamode.com' -d 'eamode.com' --manual --preferred-challenges dns --keep-until-expiring --quiet --manual-auth-hook /root/authenticator_godaddy.sh  --manual-cleanup-hook /root/cleanup_godaddy.sh 
-#renew
+sudo certbot certonly -d '*.eamode.com' -d 'eamode.com' --manual --preferred-challenges dns --keep-until-expiring --quiet --manual-public-ip-logging-ok --manual-auth-hook /root/authenticator_godaddy.sh  --manual-cleanup-hook /root/cleanup_godaddy.sh 
 
-
+#crontab entries
+0 5 * * * certbot certonly -d '*.eamode.com' -d 'eamode.com' --manual --preferred-challenges dns --keep-until-expiring --quiet --manual-public-ip-logging-ok --manual-auth-hook /root/authenticator_godaddy.sh  --manual-cleanup-hook /root/cleanup_godaddy.sh
+0 6 * * * certbot certonly -d '*.eamode.cloud' --manual --preferred-challenges dns --keep-until-expiring --quiet --manual-public-ip-logging-ok --manual-auth-hook /root/authenticator_godaddy.sh  --manual-cleanup-hook /root/cleanup_godaddy.sh
 ```
 ## Developer
 ```shell
