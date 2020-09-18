@@ -5,7 +5,8 @@ EA Mode management CLI. Managing infrastructure and applications
 ```sh
 eactl create website ea.eamode.cloud dist/mode-ui-exp/ -e mode
 eactl update website ea.eamode.cloud dist/mode-ui-exp/ -e mode
-
+eactl update nginx
+eactl update pm2app ace2-monitor.eamode.cloud . -e mode
 ```
 
 

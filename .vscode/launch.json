@@ -7,6 +7,22 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "update pm2 app",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/bin/eactl",
+      "args": [
+        "update",
+        "pm2app",
+        "ace2-monitor-api.eamode.com",
+        "../../ace2/ace2-monitor-api/",
+        "-e",
+        "mode"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "no args",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/eactl",

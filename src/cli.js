@@ -26,6 +26,7 @@ Create Commands:
 Update Commands:
  website        Update website
  nginx          Sync nginx.conf and conf.d/ with remote
+ pm2app         Update a PM2 app
 
 Usage:
  eactl [flags] [options]
@@ -202,7 +203,7 @@ export async function cli(args) {
         type: 'list',
         name: 'commandType',
         message: 'Please choose what to update',
-        choices: ['website', 'nginx'],
+        choices: ['website', 'pm2app', 'nginx'],
         default: 'website'
       })
       const answers = await inquirer.prompt(questions)
