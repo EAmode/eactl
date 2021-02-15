@@ -57,7 +57,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "update website",
+      "name": "update website ea.eamode.cloud",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/bin/eactl",
       "args": [
@@ -65,6 +65,22 @@
         "website",
         "ea.eamode.cloud",
         "../mode/mode-ui-exp/dist/mode-ui-exp/",
+        "-e",
+        "mode"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "update website",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/bin/eactl",
+      "args": [
+        "update",
+        "website",
+        "eamode.com",
+        "../ea-website/dist/",
         "-e",
         "mode"
       ],

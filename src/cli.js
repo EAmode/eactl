@@ -2,7 +2,7 @@ import fs from 'fs'
 import { homedir } from 'os'
 import { resolve } from 'path'
 import { promisify } from 'util'
-import { safeLoad } from 'js-yaml'
+import { load } from 'js-yaml'
 
 import arg from 'arg'
 import inquirer from 'inquirer'
@@ -49,10 +49,10 @@ function parseArgumentsIntoOptions(rawArgs) {
       '--help': Boolean,
       '-e': '--environment',
       '-p': '--path',
-      '-s': '--subdomains'
+      '-s': '--subdomains',
     },
     {
-      argv: rawArgs.slice(2)
+      argv: rawArgs.slice(2),
     }
   )
   return {
@@ -63,7 +63,7 @@ function parseArgumentsIntoOptions(rawArgs) {
     commandType: args._[1],
     commandOption1: args._[2],
     commandOption2: args._[3],
-    printHelp: args['--help'] || false
+    printHelp: args['--help'] || false,
   }
 }
 
@@ -98,7 +98,9 @@ async function promptForMissingOptions(options) {
   let environments = []
   try {
     const content = await readdir(options.path, { withFileTypes: true })
-    environments = content.filter(x => x.isDirectory()).map(x => x.name)
+    environments = content
+      .filter((x) => x.isDirectory() || x.isSymbolicLink())
+      .map((x) => x.name)
     if (environments.length === 0) {
       console.error(
         '%s No environment found in %s',
@@ -124,7 +126,7 @@ async function promptForMissingOptions(options) {
       name: 'environment',
       message: 'Select environment:',
       choices: environments,
-      default: environments[0]
+      default: environments[0],
     })
   }
 
@@ -134,7 +136,7 @@ async function promptForMissingOptions(options) {
       name: 'command',
       message: 'Please choose a command',
       choices: ['ls', 'update', 'create'],
-      default: 'ls'
+      default: 'ls',
     })
   }
 
@@ -143,11 +145,11 @@ async function promptForMissingOptions(options) {
     ...options,
     command: options.command || answers.command,
     environment: options.environment || answers.environment,
-    envPath: resolve(options.path, options.environment || answers.environment)
+    envPath: resolve(options.path, options.environment || answers.environment),
   }
 
   try {
-    const envData = safeLoad(
+    const envData = load(
       fs.readFileSync(
         resolve(
           completed_options.path,
@@ -190,7 +192,7 @@ export async function cli(args) {
         name: 'commandType',
         message: 'Please choose what to create',
         choices: ['website'],
-        default: 'website'
+        default: 'website',
       })
       const answers = await inquirer.prompt(questions)
       options.commandType = answers.commandType
@@ -204,7 +206,7 @@ export async function cli(args) {
         name: 'commandType',
         message: 'Please choose what to update',
         choices: ['website', 'pm2app', 'nginx'],
-        default: 'website'
+        default: 'website',
       })
       const answers = await inquirer.prompt(questions)
       options.commandType = answers.commandType

@@ -1,5 +1,10 @@
 # eactl
-EA Mode management CLI. Managing infrastructure and applications
+EA Mode Management CLI to manage infrastructure and applications.
+
+## Getting Started
+
+Point the `EACTL_PATH` environment variable to you folder with all the environments.
+
 
 ## Eaxamples
 ```sh
