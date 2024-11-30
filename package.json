@@ -29,18 +29,18 @@
     "printWidth": 80
   },
   "dependencies": {
-    "arg": "^5.0.0",
+    "arg": "^5.0.2",
     "chalk": "^4.1.0",
     "cpx": "^1.5.0",
     "esm": "^3.2.25",
     "execa": "^5.0.0",
     "inquirer": "^7.3.3",
-    "js-yaml": "^4.0.0",
+    "js-yaml": "^4.1.0",
     "listr": "^0.14.3",
     "ncp": "^2.0.0",
     "pkg-install": "^1.0.0",
-    "psl": "^1.8.0",
+    "psl": "^1.14.0",
     "rimraf": "^3.0.2",
-    "shelljs": "^0.8.4"
+    "shelljs": "^0.8.5"
   }
 }
